@@ -10,7 +10,7 @@ interface PlayerHandProps {
 
 export default function PlayerHand({ cards, onCardClick, canPlay, isCurrentPlayer }: PlayerHandProps) {
   return (
-    <div className="flex gap-2 flex-wrap justify-center">
+    <div className="flex gap-1 sm:gap-2 flex-wrap justify-center">
       {cards.map(card => (
         <div key={card.id} id={`card-${card.id}`}>
           <Card

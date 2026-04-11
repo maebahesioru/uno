@@ -53,7 +53,7 @@ export default function GameSetup({ onStartGame }: GameSetupProps) {
         <h1 className="text-4xl font-bold text-white text-center mb-2">UNO</h1>
         <p className="text-white text-center mb-4 text-sm">ゲーム</p>
         
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* 左列 */}
           <div className="space-y-4">
             <div className="bg-white bg-opacity-10 rounded-lg p-4">
@@ -242,7 +242,7 @@ export default function GameSetup({ onStartGame }: GameSetupProps) {
               AIプレイヤー人数を選択
             </h2>
             
-            <div className="grid grid-cols-6 gap-2">
+            <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
               {aiOptions.map(count => (
                 <button
                   key={count}

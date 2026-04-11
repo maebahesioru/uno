@@ -50,16 +50,14 @@ export default function GameBoard({ aiPlayerCount, deckOptions, scoringRule, hou
     
     if (currentPlayer.isAI) {
       const timer = setTimeout(() => {
-        // AIのUNO宣言チェック（70%の確率で宣言、30%で忘れる）
         if (currentPlayer.hand.length === 1 && !gameState.unoDeclarations.has(currentPlayer.id)) {
-          const shouldDeclare = Math.random() < 0.7; // 70%の確率で宣言
+          const shouldDeclare = Math.random() < 0.7;
           if (shouldDeclare) {
             const newState = declareUno(gameState, currentPlayer.id);
             setGameState(newState);
             setMessage(`${currentPlayer.name}が「UNO!」と宣言しました`);
             return;
           }
-          // 30%の確率で宣言を忘れる（何もしない）
         }
         
         const { cardId, color } = getAIMove(gameState);
@@ -202,10 +200,6 @@ export default function GameBoard({ aiPlayerCount, deckOptions, scoringRule, hou
     setMessage('');
   };
 
-  const handleBackToSetup = () => {
-    onBackToSetup();
-  };
-
   if (!gameState) return <div className="text-white text-center">読み込み中...</div>;
 
   const player = gameState.players[0];
@@ -213,164 +207,153 @@ export default function GameBoard({ aiPlayerCount, deckOptions, scoringRule, hou
   const isPlayerTurn = gameState.currentPlayerIndex === 0;
 
   const aiPlayers = gameState.players.slice(1);
-  const gridCols = aiPlayers.length <= 3 ? 3 : aiPlayers.length <= 5 ? 5 : 6;
 
   return (
-    <div className="h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 overflow-hidden flex items-center justify-center p-4">
-      <div className="w-full max-w-[1600px] h-full max-h-[900px] flex flex-col">
-        <div className="flex justify-between items-center mb-2">
-          <button
-            onClick={handleBackToSetup}
-            className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-3 py-1.5 rounded-lg transition-colors text-sm"
-          >
-            ← 設定
-          </button>
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-white">UNO</h1>
-            <p className="text-white text-sm opacity-75">
-              {gameState.scoringRule === 'international' ? '国際ルール (500点先取)' : '日本ルール (5ラウンド制)'} - ラウンド {gameState.roundNumber}
-            </p>
-          </div>
-          <div className="w-20"></div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex flex-col p-2 sm:p-4">
+      {/* ヘッダー */}
+      <div className="flex justify-between items-center mb-2">
+        <button
+          onClick={onBackToSetup}
+          className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg transition-colors text-xs sm:text-sm"
+        >
+          ← 設定
+        </button>
+        <div className="text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">UNO</h1>
+          <p className="text-white text-xs opacity-75">
+            {gameState.scoringRule === 'international' ? '国際ルール' : '日本ルール'} - R{gameState.roundNumber}
+          </p>
         </div>
-        
-        {gameState.gameOver && (
-          <div className="bg-yellow-400 text-black p-4 rounded-lg mb-2 text-center animate-bounce">
-            <h2 className="text-2xl font-bold mb-2">🎉 {gameState.winner} の勝利！ 🎉</h2>
-            <div className="text-lg mb-3">
-              <p className="font-bold">
-                {gameState.scoringRule === 'international' ? '国際ルール' : '日本ルール'} - ラウンド {gameState.roundNumber}
-              </p>
-              <p className="font-bold mt-2">スコア:</p>
-              {gameState.players.map(p => (
-                <p key={p.id}>{p.name}: {gameState.scores[p.id]}点</p>
-              ))}
-              {gameState.scoringRule === 'international' && (
-                <p className="text-sm mt-2 opacity-75">500点先取で総合優勝</p>
-              )}
-              {gameState.scoringRule === 'japanese' && gameState.roundNumber < 5 && (
-                <p className="text-sm mt-2 opacity-75">5ラウンド制 (残り{5 - gameState.roundNumber}ラウンド)</p>
-              )}
-            </div>
-            <div className="flex gap-3 justify-center">
-              <button
-                onClick={handleNewGame}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 hover:scale-105 transition-all"
-              >
-                もう一度
-              </button>
-              <button
-                onClick={handleBackToSetup}
-                className="bg-gray-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-gray-700 hover:scale-105 transition-all"
-              >
-                設定
-              </button>
-            </div>
-          </div>
-        )}
+        <div className="w-16 sm:w-20"></div>
+      </div>
 
-        <div className={`grid gap-2 mb-2`} style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}>
-          {aiPlayers.map((p, idx) => {
-            const hasUnoViolation = p.hand.length === 1 && !gameState.unoDeclarations.has(p.id);
-            return (
-              <div
-                key={p.id}
-                id={`ai-player-${p.id}`}
-                className={`bg-white bg-opacity-10 p-2 rounded-lg transition-all duration-300 ${
-                  gameState.currentPlayerIndex === idx + 1 ? 'ring-2 ring-yellow-400 scale-105' : 'scale-100'
-                }`}
-              >
-                <div className="flex justify-between items-center mb-1">
-                  <h3 className="text-white font-bold text-sm">{p.name}</h3>
-                  {hasUnoViolation && (
-                    <button
-                      onClick={() => handleCheckUnoViolation(p.id)}
-                      className="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded"
-                    >
-                      指摘
-                    </button>
-                  )}
-                </div>
-                <div className="flex gap-0.5 flex-wrap">
-                  {p.hand.slice(0, 10).map((_, i) => (
-                    <div key={i} className="w-5">
-                      <Card card={{ id: '', color: 'wild', value: 'wild' }} isBack />
-                    </div>
-                  ))}
-                  {p.hand.length > 10 && (
-                    <span className="text-white text-xs ml-1">+{p.hand.length - 10}</span>
-                  )}
-                </div>
-                <p className="text-white text-xs mt-1">
-                  {p.hand.length}枚 | スコア: {gameState.scores[p.id]}
-                </p>
+      {/* ゲームオーバー */}
+      {gameState.gameOver && (
+        <div className="bg-yellow-400 text-black p-3 sm:p-4 rounded-lg mb-2 text-center animate-bounce">
+          <h2 className="text-xl sm:text-2xl font-bold mb-1">🎉 {gameState.winner} の勝利！ 🎉</h2>
+          <div className="text-sm mb-2">
+            {gameState.players.map(p => (
+              <p key={p.id}>{p.name}: {gameState.scores[p.id]}点</p>
+            ))}
+          </div>
+          <div className="flex gap-2 justify-center">
+            <button onClick={handleNewGame} className="bg-blue-600 text-white px-4 py-1.5 rounded-lg font-bold text-sm hover:bg-blue-700">
+              もう一度
+            </button>
+            <button onClick={onBackToSetup} className="bg-gray-600 text-white px-4 py-1.5 rounded-lg font-bold text-sm hover:bg-gray-700">
+              設定
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* AIプレイヤーエリア */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-2 mb-2">
+        {aiPlayers.map((p, idx) => {
+          const hasUnoViolation = p.hand.length === 1 && !gameState.unoDeclarations.has(p.id);
+          return (
+            <div
+              key={p.id}
+              id={`ai-player-${p.id}`}
+              className={`bg-white bg-opacity-10 p-1.5 sm:p-2 rounded-lg transition-all duration-300 ${
+                gameState.currentPlayerIndex === idx + 1 ? 'ring-2 ring-yellow-400 scale-105' : ''
+              }`}
+            >
+              <div className="flex justify-between items-center mb-1">
+                <h3 className="text-white font-bold text-xs sm:text-sm truncate">{p.name}</h3>
+                {hasUnoViolation && (
+                  <button
+                    onClick={() => handleCheckUnoViolation(p.id)}
+                    className="bg-red-500 hover:bg-red-600 text-white text-xs px-1.5 py-0.5 rounded flex-shrink-0"
+                  >
+                    指摘
+                  </button>
+                )}
               </div>
-            );
-          })}
-        </div>
+              <div className="flex gap-0.5 flex-wrap">
+                {p.hand.slice(0, 8).map((_, i) => (
+                  <div key={i} className="w-4 sm:w-5">
+                    <Card card={{ id: '', color: 'wild', value: 'wild' }} isBack />
+                  </div>
+                ))}
+                {p.hand.length > 8 && (
+                  <span className="text-white text-xs">+{p.hand.length - 8}</span>
+                )}
+              </div>
+              <p className="text-white text-xs mt-0.5">{p.hand.length}枚 | {gameState.scores[p.id]}点</p>
+            </div>
+          );
+        })}
+      </div>
 
-        <div className="bg-white bg-opacity-10 p-4 rounded-lg mb-2 flex-shrink-0">
-          <div className="flex items-center justify-center gap-6">
-            <div className="transition-transform hover:scale-105">
-              <p className="text-white text-center mb-1 text-sm">山札</p>
-              <Card card={{ id: '', color: 'wild', value: 'wild' }} isBack onClick={isPlayerTurn && !gameState.gameOver ? handleDrawCard : undefined} disabled={!isPlayerTurn || gameState.gameOver} />
-              <p className="text-white text-center mt-1 text-sm">{gameState.deck.length}枚</p>
-            </div>
-            
-            <div id="discard-pile" className="transition-all duration-300">
-              <p className="text-white text-center mb-1 text-sm">捨て札</p>
-              <Card card={topCard} />
-              <p className="text-white text-center mt-1 text-sm">色: {gameState.currentColor}</p>
-            </div>
+      {/* 中央エリア（山札・捨て札） */}
+      <div className="bg-white bg-opacity-10 p-2 sm:p-4 rounded-lg mb-2">
+        <div className="flex items-center justify-center gap-4 sm:gap-6">
+          <div className="text-center">
+            <p className="text-white text-xs sm:text-sm mb-1">山札</p>
+            <Card
+              card={{ id: '', color: 'wild', value: 'wild' }}
+              isBack
+              onClick={isPlayerTurn && !gameState.gameOver ? handleDrawCard : undefined}
+              disabled={!isPlayerTurn || gameState.gameOver}
+            />
+            <p className="text-white text-xs mt-1">{gameState.deck.length}枚</p>
           </div>
           
-          {message && (
-            <p className="text-yellow-300 text-center mt-2 text-lg font-bold animate-pulse">{message}</p>
-          )}
-        </div>
-
-        <div className={`bg-white bg-opacity-10 p-3 rounded-lg flex-1 min-h-0 flex flex-col transition-all duration-300 ${isPlayerTurn && !gameState.gameOver ? 'ring-2 ring-yellow-400 ring-offset-2 ring-offset-purple-900' : ''}`}>
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-white font-bold text-lg">あなたの手札 ({player.hand.length}枚) | スコア: {gameState.scores['player']}</h3>
-            <div className="flex gap-2">
-              {showUnoButton && (
-                <button
-                  onClick={handleDeclareUno}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold animate-pulse"
-                >
-                  UNO!
-                </button>
-              )}
-              {gameState.challengeAvailable && isPlayerTurn && (
-                <button
-                  onClick={handleChallenge}
-                  className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-bold"
-                >
-                  チャレンジ
-                </button>
-              )}
-            </div>
-          </div>
-          <div className="overflow-y-auto flex-1">
-            <PlayerHand
-              cards={player.hand}
-              onCardClick={handleCardClick}
-              canPlay={(card) => canPlayCard(card, topCard, gameState.currentColor)}
-              isCurrentPlayer={isPlayerTurn && !gameState.gameOver}
-            />
+          <div id="discard-pile" className="text-center">
+            <p className="text-white text-xs sm:text-sm mb-1">捨て札</p>
+            <Card card={topCard} />
+            <p className="text-white text-xs mt-1">{gameState.currentColor}</p>
           </div>
         </div>
-
-        {showColorPicker && <ColorPicker onColorSelect={handleColorSelect} />}
         
-        {flyingCard && (
-          <FlyingCardAnimation
-            card={flyingCard.card}
-            startX={flyingCard.startX}
-            startY={flyingCard.startY}
-          />
+        {message && (
+          <p className="text-yellow-300 text-center mt-2 text-sm sm:text-lg font-bold animate-pulse">{message}</p>
         )}
       </div>
+
+      {/* プレイヤー手札エリア */}
+      <div className={`bg-white bg-opacity-10 p-2 sm:p-3 rounded-lg flex-1 ${isPlayerTurn && !gameState.gameOver ? 'ring-2 ring-yellow-400' : ''}`}>
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="text-white font-bold text-sm sm:text-base">
+            あなたの手札 ({player.hand.length}枚) | {gameState.scores['player']}点
+          </h3>
+          <div className="flex gap-1.5 sm:gap-2">
+            {showUnoButton && (
+              <button
+                onClick={handleDeclareUno}
+                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg font-bold text-sm animate-pulse"
+              >
+                UNO!
+              </button>
+            )}
+            {gameState.challengeAvailable && isPlayerTurn && (
+              <button
+                onClick={handleChallenge}
+                className="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg font-bold text-sm"
+              >
+                チャレンジ
+              </button>
+            )}
+          </div>
+        </div>
+        <PlayerHand
+          cards={player.hand}
+          onCardClick={handleCardClick}
+          canPlay={(card) => canPlayCard(card, topCard, gameState.currentColor)}
+          isCurrentPlayer={isPlayerTurn && !gameState.gameOver}
+        />
+      </div>
+
+      {showColorPicker && <ColorPicker onColorSelect={handleColorSelect} />}
+      
+      {flyingCard && (
+        <FlyingCardAnimation
+          card={flyingCard.card}
+          startX={flyingCard.startX}
+          startY={flyingCard.startY}
+        />
+      )}
     </div>
   );
 }
@@ -392,7 +375,7 @@ function FlyingCardAnimation({ card, startX, startY }: { card: any; startX: numb
         '--end-y': `${endY - startY}px`,
       } as any}
     >
-      <div className="w-20 h-28">
+      <div className="w-14 h-20 sm:w-20 sm:h-28">
         <Card card={card} />
       </div>
     </div>

@@ -33,7 +33,7 @@ export default function Card({ card, onClick, disabled, isBack }: CardProps) {
   if (isBack) {
     return (
       <div
-        className={`w-20 h-28 rounded-lg shadow-lg cursor-pointer transition-transform hover:scale-105 ${
+        className={`w-14 h-20 sm:w-20 sm:h-28 rounded-lg shadow-lg cursor-pointer transition-transform hover:scale-105 ${
           disabled ? 'opacity-50 cursor-not-allowed' : ''
         }`}
         onClick={!disabled ? onClick : undefined}
@@ -55,7 +55,7 @@ export default function Card({ card, onClick, disabled, isBack }: CardProps) {
 
   return (
     <div
-      className={`w-20 h-28 rounded-lg shadow-lg transition-all duration-300 ${
+      className={`w-14 h-20 sm:w-20 sm:h-28 rounded-lg shadow-lg transition-all duration-300 ${
         onClick && !disabled ? 'cursor-pointer hover:scale-110 hover:-translate-y-3 hover:rotate-2 hover:shadow-2xl' : ''
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       onClick={!disabled && onClick ? onClick : undefined}
