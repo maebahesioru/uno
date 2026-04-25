@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>{children}        <script src="https://hikakinmaniacoin.hikamer.f5.si/ad.js" data-user-id="cmo8lk1kj0000aggyuhzgv5vk" async></script>
+      <body>{children}
       </body>
     </html>
   );
