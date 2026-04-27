@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from "next";
 import "./globals.css";
 
+// rebuild trigger
 export const metadata: Metadata = {
   metadataBase: new URL("https://uno.hikamer.f5.si"),
   title: "UNO ゲーム",
