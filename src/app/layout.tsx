@@ -2,8 +2,23 @@
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://uno.hikamer.f5.si"),
   title: "UNO ゲーム",
   description: "AIと対戦できるUNOゲーム",
+  openGraph: {
+    title: "UNO ゲーム",
+    description: "AIと対戦できるUNOゲーム",
+    type: "website",
+    locale: "ja_JP",
+    images: ["/opengraph-image"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "UNO ゲーム",
+    description: "AIと対戦できるUNOゲーム",
+    images: ["/opengraph-image"],
+  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
